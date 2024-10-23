@@ -2,9 +2,12 @@ package com.example.spring.controller;
 
 import com.example.spring.model.User;
 import com.example.spring.service.UserService;
+import com.example.spring.validation.UserForm;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -32,15 +35,26 @@ public class UserController {
     }
 
     @GetMapping("/add-user")
-    public String getAddUserForm() {
+    public String showAddUserForm(
+            Model model
+    ) {
+        model.addAttribute("userForm", new UserForm());
         return "add-user";
     }
 
     @PostMapping("/add-user")
-    @ResponseBody
-    public ResponseEntity<?> addUser(@RequestBody User user) {
-        boolean result = userService.addUser(user);
-        return ResponseEntity.ok().body(result);
+    public String addUser(
+            @Valid UserForm userForm,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return "add-user";
+        }
+        boolean isSuccessful = userService.addUser(userForm.toUser());
+        if (!isSuccessful) {
+            return "add-user";
+        }
+        return "redirect:/users";
     }
 
     @GetMapping("/edit-user/{id}")
