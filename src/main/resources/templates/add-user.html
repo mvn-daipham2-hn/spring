@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add User</title>
+</head>
+<body>
+
+<h1>Add New User</h1>
+
+<form id="addUserForm">
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username" required><br><br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" required><br><br>
+
+    <label for="birthday">Birthday:</label><br>
+    <input type="date" id="birthday" name="birthday" required><br><br>
+
+    <button type="submit">Submit</button>
+    <button type="button" onclick="backToUserList()">Cancel</button>
+</form>
+
+<script>
+    function backToUserList() {
+        window.location.href = '[[@{/users}]]';
+    }
+
+    document.getElementById('addUserForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const addUserUrl = '[[@{/users/add-user}]]';
+        const newUser = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            birthday: document.getElementById('birthday').value,
+        };
+
+        fetch(addUserUrl, {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newUser),
+        }).then(async response => {
+            const isSuccessful = await response.json();
+            if (isSuccessful) {
+                alert("Add new user successfully!");
+                backToUserList();
+            } else {
+                alert("Cannot add new user now, try again later!");
+            }
+        }).catch(console.error);
+    });
+</script>
+
+</body>
+</html>
