@@ -19,6 +19,24 @@
             padding: 10px;
             text-align: left;
         }
+
+        a {
+            font-size: 25px;
+        }
+
+        .pagination-item {
+            margin-top: 20px;
+        }
+
+        .active {
+            color: blue;
+            font-weight: bold;
+        }
+
+        .inactive {
+            color: grey;
+            font-weight: 400;
+        }
     </style>
 </head>
 
@@ -43,23 +61,40 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="user : ${users}">
-        <td th:text="*{user.id}"/>
-        <td th:text="${user.username}"/>
-        <td th:text="${user.email}"/>
-        <td th:text="${#dates.format(user.birthday, 'dd-MM-yyyy')}"/>
-        <td>
-            <button th:onclick="editUser([[${user.id}]])">Edit</button>
-            <button th:onclick="deleteUser([[${user.id}]], [[${user.username}]])">Delete</button>
-        </td>
-    </tr>
+    <th:block th:each="user : ${userPage}">
+        <tr>
+            <td th:text="${user.id}"/>
+            <td th:text="${user.username}"/>
+            <td th:text="${user.email}"/>
+            <td th:text="${#dates.format(user.birthday, 'dd-MM-yyyy')}"/>
+            <td>
+                <button th:onclick="editUser([[${user.id}]])">Edit</button>
+                <button th:onclick="deleteUser([[${user.id}]], [[${user.username}]])">Delete</button>
+            </td>
+        </tr>
+    </th:block>
     </tbody>
 </table>
+
+<div style="display: flex; gap: 20px">
+    <div class="pagination-item" th:if="${pageNumbers!=null}" th:each="pageNumber: ${pageNumbers}">
+        <a th:href="@{/users(page=${pageNumber}, size=${userPage.size}, username=${searchKey})}"
+           th:text="${pageNumber}"
+           th:class="${pageNumber == userPage.number + 1} ? 'active': 'inactive'"/>
+    </div>
+</div>
 
 <script>
     function searchUser() {
         const username = document.getElementById('search').value;
-        window.location.href = "[[@{/users?username=}]]" + username;
+        const query = window.location.search;
+        const searchParams = new URLSearchParams(query);
+        const usernameKey = "username";
+        searchParams.delete(usernameKey);
+        if (username !== "" && !searchParams.has(usernameKey, username)) {
+            searchParams.append(usernameKey, username);
+        }
+        window.location.href = "[[@{/users?}]]" + searchParams.toString();
     }
 
     function addNewUser() {

@@ -29,6 +29,15 @@ public class User {
     @Column(name = "birthday", unique = true, nullable = false)
     private Date birthday;
 
+    public User() {
+    }
+
+    public User(String email, String username, Date birthday) {
+        this.email = email;
+        this.birthday = birthday;
+        this.username = username;
+    }
+
     @Override
     public String toString() {
         return "User{" +
