@@ -1,10 +1,14 @@
 package com.example.spring.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "user")
 public class User {
@@ -24,38 +28,6 @@ public class User {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "birthday", unique = true, nullable = false)
     private Date birthday;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
 
     @Override
     public String toString() {

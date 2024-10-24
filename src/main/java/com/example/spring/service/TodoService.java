@@ -1,8 +1,12 @@
 package com.example.spring.service;
 
 import com.example.spring.dao.TodoRepository;
+import com.example.spring.errorhandler.ApiSubError;
+import com.example.spring.errorhandler.ApiValidationError;
+import com.example.spring.errorhandler.ValidationException;
 import com.example.spring.helper.StringHelper;
 import com.example.spring.model.Todo;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,37 +32,37 @@ public class TodoService {
         return todos;
     }
 
-    public Optional<Todo> getTodoDetails(long id) {
-        return todoRepository.findById(id);
-    }
-
-    public boolean updateTodo(Todo todo) {
-        try {
-            Optional<Todo> existedTodo = getTodoDetails(todo.getId());
-            if (existedTodo.isEmpty()) {
-                return false;
-            } else {
-                todoRepository.save(todo);
-                return true;
-            }
-        } catch (Exception e) {
-            return false;
+    public Todo getTodoDetails(long id) {
+        Optional<Todo> todoOptional = todoRepository.findById(id);
+        if (todoOptional.isPresent()) {
+            return todoOptional.get();
+        } else {
+            throw new EntityNotFoundException("Todo was not found for parameters {id=" + id + "}");
         }
     }
 
-    public boolean createTodo(String title) {
-        try {
-            if (StringHelper.isNullOrEmpty(title)) {
-                return false;
-            }
-
-            Todo newTodo = new Todo();
-            newTodo.setTitle(title);
-            todoRepository.save(newTodo);
-            return true;
-        } catch (Exception e) {
-            return false;
+    private void validateTodoTitle(String title) {
+        if (StringHelper.isNullOrEmpty(title)) {
+            List<ApiSubError> subErrors = new ArrayList<>();
+            subErrors.add(new ApiValidationError(
+                    "user",
+                    "title",
+                    null,
+                    "must not null")
+            );
+            throw new ValidationException(subErrors);
         }
+    }
+
+    public void updateTodo(Todo todo) {
+        getTodoDetails(todo.getId());
+        validateTodoTitle(todo.getTitle());
+        todoRepository.save(todo);
+    }
+
+    public void createTodo(Todo newTodo) {
+        validateTodoTitle(newTodo.getTitle());
+        todoRepository.save(newTodo.todoWithoutId());
     }
 
     public boolean deleteTodo(long id) {

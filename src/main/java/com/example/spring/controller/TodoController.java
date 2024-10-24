@@ -6,8 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 public class TodoController {
@@ -19,32 +17,38 @@ public class TodoController {
 
     @GetMapping("/todos")
     ResponseEntity<List<Todo>> getTodos(
-            @RequestParam(value = "title", required = false) String title) {
-        return ResponseEntity.ok().body(todoService.getTodos(title));
+            @RequestParam(value = "title", required = false) String title
+    ) {
+        return ResponseEntity.ok(todoService.getTodos(title));
     }
 
     @GetMapping("/todos/{id}")
-    ResponseEntity<?> getTodoDetails(@PathVariable long id) {
-        Optional<Todo> todoOptional = todoService.getTodoDetails(id);
-        return ResponseEntity.ok().body(todoOptional.orElse(null));
+    ResponseEntity<?> getTodoDetails(
+            @PathVariable long id
+    ) {
+        Todo todo = todoService.getTodoDetails(id);
+        return ResponseEntity.ok(todo);
     }
 
     @PutMapping("/todo")
-    ResponseEntity<String> updateTodo(@RequestBody Todo todo) {
-        boolean result = todoService.updateTodo(todo);
-        return ResponseEntity.ok().body(result ? "Update Success" : "Update Failed");
+    ResponseEntity<String> updateTodo(
+            @RequestBody Todo todo
+    ) {
+        todoService.updateTodo(todo);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/todo")
     ResponseEntity<String> createTodo(
-            @RequestBody Map<String, String> titleInfo) {
-        boolean result = todoService.createTodo(titleInfo.get("title"));
-        return ResponseEntity.ok().body(result ? "Create Success" : "Create Failed");
+            @RequestBody Todo todo
+    ) {
+        todoService.createTodo(todo);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/todo")
     ResponseEntity<String> deleteTodo(@RequestBody long id) {
         boolean result = todoService.deleteTodo(id);
-        return ResponseEntity.ok().body(result ? "Remove Success" : "Remove Failed");
+        return ResponseEntity.ok(result ? "Remove Success" : "Remove Failed");
     }
 }
