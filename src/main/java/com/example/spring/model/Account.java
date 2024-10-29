@@ -18,5 +18,4 @@ public class Account {
 
     @Column(name = "password", nullable = false)
     private String password;
-
 }

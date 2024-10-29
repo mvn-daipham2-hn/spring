@@ -3,6 +3,7 @@ package com.example.spring.controller;
 import com.example.spring.dto.AccountDTO;
 import com.example.spring.service.AccountService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,6 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class LoginController {
+    AccountService accountService;
+
+    @Autowired
+    public LoginController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
     @GetMapping("/login")
     public String login(
@@ -30,11 +37,17 @@ public class LoginController {
             @ModelAttribute("accountForm") @Valid AccountDTO accountForm,
             BindingResult bindingResult
     ) {
-        if (!bindingResult.hasErrors() && !accountForm.getPassword().equalsIgnoreCase(accountForm.getConfirmPassword())) {
+        if (bindingResult.hasErrors()) {
+            return "register";
+        } else if (!accountForm.getPassword().equalsIgnoreCase(accountForm.getConfirmPassword())) {
             bindingResult.rejectValue("confirmPassword", "", "Password not match");
+            return "register";
         }
-        // TODO: Finish registration process later
-        // If have free time, continue sand castle!
-        return "register";
+        boolean isSuccessful = accountService.addAccount(accountForm);
+        if (!isSuccessful) {
+            bindingResult.rejectValue("username", "", "Your username already exists");
+            return "register";
+        }
+        return "redirect:/login";
     }
 }
