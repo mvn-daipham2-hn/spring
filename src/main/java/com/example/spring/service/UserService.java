@@ -32,7 +32,7 @@ public class UserService {
 
     public Page<User> getUsers(String username, Pageable pageable) {
         if (username != null) {
-            return userRepository.findAllByUsername(username, pageable);
+            return userRepository.findAllByUsernameContainingIgnoreCase(username, pageable);
         } else {
             return userRepository.findAll(pageable);
         }

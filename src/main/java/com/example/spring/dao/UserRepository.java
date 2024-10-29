@@ -10,4 +10,7 @@ import org.springframework.data.repository.query.Param;
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query("FROM User WHERE username LIKE %:username%")
     Page<User> findAllByUsername(@Param("username") String username, Pageable pageable);
+
+    /// This method is the same as "findAllByUsername" above, but simpler
+    Page<User> findAllByUsernameContainingIgnoreCase(String search, Pageable pageable);
 }
