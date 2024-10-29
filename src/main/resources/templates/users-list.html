@@ -37,12 +37,31 @@
             color: grey;
             font-weight: 400;
         }
+
+        #logout-button {
+            padding: 5px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 10px;
+            color: green;
+        }
+
+        #title-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 
 <body>
 
-<h1>User List</h1>
+<div id="title-wrapper">
+    <h1>User List</h1>
+    <form th:action="@{/logout}" method="post">
+        <input id="logout-button" type="submit" value="Log out"/>
+    </form>
+</div>
 
 <label for="search">
     <input type="text" id="search" placeholder="Search by username" th:value="${searchKey}">

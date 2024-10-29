@@ -1,7 +1,7 @@
-package com.example.spring.validation;
+package com.example.spring.dto;
 
+import com.example.spring.dto.customconstraint.HasDateFormatted;
 import com.example.spring.model.User;
-import com.example.spring.validation.customconstraint.HasDateFormatted;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class UserForm {
+public class UserDTO {
     @Size(min = 5, message = "Username must greater than 4 characters!")
     private String username;
 

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Registration</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/style.css}">
+</head>
+<body>
+<div class="container">
+    <div class="registration form">
+        <header>Signup</header>
+        <form action="#" th:action="@{/register-process}" th:object="${accountForm}" method="post">
+            <label>
+                <input type="text" name="user" placeholder="Enter your username"
+                       th:field="*{username}">
+                <p class="error-field" th:if="${#fields.hasErrors('username')}"
+                   th:errors="*{username}"></p>
+            </label>
+            <label>
+                <input type="password" name="password" placeholder="Create a password"
+                       th:field="*{password}">
+                <p class="error-field" th:if="${#fields.hasErrors('password')}"
+                   th:errors="*{password}"></p>
+            </label>
+            <label>
+                <input type="password" name="password-confirmed"
+                       placeholder="Confirm your password"
+                       th:field="*{confirmPassword}">
+                <p class="error-field" th:if="${#fields.hasErrors('confirmPassword')}"
+                   th:errors="*{confirmPassword}"></p>
+            </label>
+            <input type="submit" class="button" value="Signup">
+        </form>
+        <div class="signup">
+        <span class="signup">Already have an account?
+            <a th:href="@{/login}">Login</a>
+        </span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

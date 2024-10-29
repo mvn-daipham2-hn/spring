@@ -1,8 +1,8 @@
 package com.example.spring.controller;
 
+import com.example.spring.dto.UserDTO;
 import com.example.spring.model.User;
 import com.example.spring.service.UserService;
-import com.example.spring.validation.UserForm;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -58,13 +58,13 @@ public class UserController {
     public String showAddUserForm(
             Model model
     ) {
-        model.addAttribute("userForm", new UserForm());
+        model.addAttribute("userForm", new UserDTO());
         return "add-user";
     }
 
     @PostMapping("/add-user")
     public String addUser(
-            @Valid UserForm userForm,
+            @Valid UserDTO userForm,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {

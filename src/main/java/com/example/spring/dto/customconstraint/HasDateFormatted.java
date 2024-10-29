@@ -1,4 +1,4 @@
-package com.example.spring.validation.customconstraint;
+package com.example.spring.dto.customconstraint;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
