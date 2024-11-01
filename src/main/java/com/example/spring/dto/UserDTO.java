@@ -1,14 +1,20 @@
 package com.example.spring.dto;
 
 import com.example.spring.dto.customconstraint.HasDateFormatted;
+import com.example.spring.errorhandler.MyValidationException;
 import com.example.spring.model.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDTO {
     @Size(min = 5, message = "Username must greater than 4 characters!")
     private String username;
@@ -58,16 +64,13 @@ public class UserDTO {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
             Date birthdayParsed = sdf.parse(birthday);
-
             User user = new User();
             user.setUsername(username);
             user.setEmail(email);
             user.setBirthday(birthdayParsed);
-
             return user;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
+        } catch (ParseException e) {
+            throw new MyValidationException("Invalid birthday!");
         }
     }
 }

@@ -1,19 +1,28 @@
 package com.example.spring.controller;
 
 import com.example.spring.dto.UserDTO;
+import com.example.spring.helper.CSVHelper;
 import com.example.spring.model.User;
 import com.example.spring.service.UserService;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.nio.file.Path;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +31,7 @@ import java.util.stream.IntStream;
 @Controller
 @RequestMapping(path = "/users")
 public class UserController {
-    UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -50,7 +59,6 @@ public class UserController {
         }
         model.addAttribute("userPage", userPage);
         model.addAttribute("searchKey", username);
-
         return "users-list";
     }
 
@@ -70,7 +78,7 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "add-user";
         }
-        boolean isSuccessful = userService.addUser(userForm.toUser());
+        boolean isSuccessful = userService.addUser(userForm);
         if (!isSuccessful) {
             return "add-user";
         }
@@ -124,5 +132,86 @@ public class UserController {
         resultMap.put("isSuccessful", isSuccessful);
         resultMap.put("message", isSuccessful ? "Update Successfully!" : "Update Failed!");
         return resultMap;
+    }
+
+    @GetMapping("/upload")
+    public String showUploadForm(Model model) {
+        List<String> files = userService.getUploadFilePaths().map(this::getUriByPath).toList();
+        model.addAttribute("files", files);
+        return "upload-form";
+    }
+
+    private String getUriByPath(Path path) {
+        String fileName = path.getFileName().toString();
+        return MvcUriComponentsBuilder.fromMethodName(
+                        UserController.class,
+                        "serveFile",
+                        fileName)
+                .build()
+                .toUri()
+                .toString();
+    }
+
+    /// When a user accesses /files/document.pdf, the filename will be "document.pdf".
+    ///
+    /// If a user accesses /files/report.final.v1.docx, the filename will be "report.final.v1.docx".
+    @GetMapping("/files/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+        Resource file = userService.loadFileAsResource(filename);
+        if (file == null) {
+            return ResponseEntity.notFound().build();
+        }
+        // HttpHeaders.CONTENT_DISPOSITION: This is the header name used to specify
+        // how the browser should handle the content in the response.
+
+        // attachment; filename="...": Sets the value of the Content-Disposition header to "attachment".
+        // When the browser sees the content as "attachment",
+        // it prompts the user to download the file instead of displaying it directly
+        // (commonly used for downloading files such as PDFs, images, etc.).
+
+        // file.getFilename(): Returns the filename and inserts it into filename="..." so the browser uses this name when saving the file.
+        return ResponseEntity.ok().header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + file.getFilename() + "\""
+        ).body(file);
+    }
+
+    @PostMapping("/upload")
+    public String upload(
+            @RequestParam("file") MultipartFile file,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (!CSVHelper.hasCSVFormat(file)) {
+            redirectAttributes.addFlashAttribute(
+                    "error_message",
+                    "Only support uploaded .csv files!"
+            );
+        } else {
+            userService.storeFileAndImportUsers(file);
+            redirectAttributes.addFlashAttribute(
+                    "message",
+                    "You successfully uploaded " + file.getOriginalFilename() + "!"
+            );
+        }
+        return "redirect:/users/upload";
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    private String handleConstraintViolationException(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute(
+                "error_message",
+                "Some records invalidate or wrong format!"
+        );
+        return "redirect:/users/upload";
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    private String handleSQLIntegrityConstraintViolationException(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute(
+                "error_message",
+                "Some records are duplicated!"
+        );
+        return "redirect:/users/upload";
     }
 }

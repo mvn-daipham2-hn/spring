@@ -57,9 +57,11 @@
             body: JSON.stringify(user),
         }).then(async (response) => {
             const data = await response.json();
-            alert(data.message);
-            if (data.isSuccessful) {
+            if (response.ok && data.isSuccessful) {
+                alert(data.message);
                 backToUserList();
+            } else {
+                alert("Update user failure!");
             }
         }).catch(console.error)
     }

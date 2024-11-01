@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -68,6 +68,7 @@
 </label>
 <button type="button" onclick="searchUser()">Search</button>
 <button type="button" onclick="addNewUser()">Add new user</button>
+<button type="button" onclick="navigateToFileUploadPage()">Go to upload page</button>
 
 <table>
     <thead>
@@ -120,6 +121,10 @@
         window.location.href = "[[@{/users/add-user}]]";
     }
 
+    function navigateToFileUploadPage() {
+        window.location.href = "[[@{/users/upload}]]";
+    }
+
     function editUser(id) {
         window.location.href = "[[@{/users/edit-user/}]]" + id;
     }
@@ -135,7 +140,7 @@
                 },
                 body: id,
             }).then(async response => {
-                const isSuccessful = await response.json();
+                const isSuccessful = response.ok && await response.json();
                 if (isSuccessful) {
                     alert("Delete user `" + username + "` successfully!");
                     window.location.reload();

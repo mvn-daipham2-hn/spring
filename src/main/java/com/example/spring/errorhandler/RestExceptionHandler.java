@@ -1,5 +1,7 @@
 package com.example.spring.errorhandler;
 
+import com.example.spring.storage.StorageException;
+import com.example.spring.storage.StorageFileNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -33,9 +35,30 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
-    @ExceptionHandler(ValidationException.class)
-    protected ResponseEntity<Object> handleValidationErrors(ValidationException ex) {
+    @ExceptionHandler(MyValidationException.class)
+    protected ResponseEntity<Object> handleValidationErrors(MyValidationException ex) {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getSubErrors());
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(StorageFileNotFoundException.class)
+    protected ResponseEntity<Object> handleStorageFileNotFound(StorageFileNotFoundException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage());
+        if (ex.getCause() != null) {
+            apiError.setDebugMessage(ex.getCause().getMessage());
+        }
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(StorageException.class)
+    protected ResponseEntity<Object> handleStoreException(StorageException ex) {
+        ApiError apiError = new ApiError(
+                ex.getStatus() != null ? ex.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage()
+        );
+        if (ex.getCause() != null) {
+            apiError.setDebugMessage(ex.getCause().getMessage());
+        }
         return buildResponseEntity(apiError);
     }
 }

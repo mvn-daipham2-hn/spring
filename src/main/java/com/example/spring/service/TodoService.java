@@ -3,7 +3,7 @@ package com.example.spring.service;
 import com.example.spring.dao.TodoRepository;
 import com.example.spring.errorhandler.ApiSubError;
 import com.example.spring.errorhandler.ApiValidationError;
-import com.example.spring.errorhandler.ValidationException;
+import com.example.spring.errorhandler.MyValidationException;
 import com.example.spring.helper.StringHelper;
 import com.example.spring.model.Todo;
 import jakarta.persistence.EntityNotFoundException;
@@ -50,7 +50,7 @@ public class TodoService {
                     null,
                     "must not null")
             );
-            throw new ValidationException(subErrors);
+            throw new MyValidationException(subErrors);
         }
     }
 

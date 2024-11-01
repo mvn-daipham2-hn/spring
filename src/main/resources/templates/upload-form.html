@@ -1,0 +1,61 @@
+<html xmlns:th="https://www.thymeleaf.org" lang="en" title="Upload CSV">
+<body>
+<style>
+    tr {
+        margin: 20px;
+    }
+
+    #message {
+        color: green;
+    }
+
+    #error-message {
+        color: red;
+    }
+
+    #title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    #exit-button {
+        font-size: 20px;
+        font-weight: bold;
+        border-radius: 5px;
+        border-width: 1px;
+        color: red;
+    }
+</style>
+<div id="title">
+    <h1>Upload files</h1>
+    <button id="exit-button" onclick="backToUserPage()">Exit</button>
+</div>
+<h2 id="message" th:if="${message}" th:text="${message}"/>
+<h2 id="error-message" th:if="${error_message}" th:text="${error_message}"/>
+<form method="POST" enctype="multipart/form-data" th:action="@{/users/upload}">
+    <table>
+        <tr>
+            <td>File to upload:</td>
+            <!--            Comment to proxy validation file type to server-->
+            <!--            <td><input type="file" name="file" accept=".csv"/></td>-->
+            <td><input type="file" name="file"/></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" value="Import"/></td>
+        </tr>
+    </table>
+</form>
+<ul>
+    <li th:each="file : ${files}">
+        <a th:href="${file}" th:text="${file}"/>
+    </li>
+</ul>
+<script>
+    function backToUserPage() {
+        window.location.href = "[[@{/users}]]";
+    }
+</script>
+</body>
+</html>

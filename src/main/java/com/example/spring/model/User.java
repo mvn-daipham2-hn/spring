@@ -25,18 +25,10 @@ public class User {
 
     /// Add [Temporal] and [DateTimeFormat] annotations to get only date part with pattern
     @Temporal(TemporalType.DATE)
+    /// The <input type="date"...> is always formatted yyyy-mm-dd!
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "birthday", unique = true, nullable = false)
     private Date birthday;
-
-    public User() {
-    }
-
-    public User(String email, String username, Date birthday) {
-        this.email = email;
-        this.birthday = birthday;
-        this.username = username;
-    }
 
     @Override
     public String toString() {
