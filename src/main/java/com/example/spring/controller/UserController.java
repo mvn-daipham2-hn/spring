@@ -42,7 +42,7 @@ public class UserController {
             Model model,
             @RequestParam(value = "username", required = false) String username,
             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(value = "size", required = false, defaultValue = "10000") Integer size,
             @RequestParam(value = "sort", required = false, defaultValue = "ASC") String sort,
             @RequestParam(value = "sortBy", required = false, defaultValue = "id") String sortBy
     ) {

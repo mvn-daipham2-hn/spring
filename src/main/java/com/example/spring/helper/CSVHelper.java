@@ -1,7 +1,7 @@
 package com.example.spring.helper;
 
+import com.example.spring.dto.UserCSVRecordDTO;
 import com.example.spring.dto.UserDTO;
-import com.example.spring.dto.UserRecordDTO;
 import com.example.spring.model.User;
 import jakarta.validation.*;
 import org.apache.commons.csv.CSVFormat;
@@ -25,7 +25,7 @@ public class CSVHelper {
         return TYPE.equals(file.getContentType());
     }
 
-    private static void validateUserRecord(Validator validator, UserRecordDTO userRecordDTO) {
+    private static void validateUserRecord(Validator validator, UserCSVRecordDTO userRecordDTO) {
         Set<ConstraintViolation<UserDTO>> violations = validator.validate(userRecordDTO);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
@@ -47,7 +47,7 @@ public class CSVHelper {
             ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
             Validator validator = factory.getValidator();
             for (CSVRecord record : records) {
-                UserRecordDTO userRecordDTO = new UserRecordDTO(
+                UserCSVRecordDTO userRecordDTO = new UserCSVRecordDTO(
                         record.get("id"),
                         record.get("username"),
                         record.get("email"),

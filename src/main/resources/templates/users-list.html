@@ -5,10 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User List</title>
     <style>
+        .table-wrapper {
+            margin-top: 30px;
+            height: 70vh;
+            overflow: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 30px;
+            overflow: auto;
         }
 
         table, th, td {
@@ -70,19 +76,19 @@
 <button type="button" onclick="addNewUser()">Add new user</button>
 <button type="button" onclick="navigateToFileUploadPage()">Go to upload page</button>
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Email</th>
-        <th>Birthday</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <th:block th:each="user : ${userPage}">
+<div class="table-wrapper">
+    <table>
+        <thead>
         <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Birthday</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${userPage}">
             <td th:text="${user.id}"/>
             <td th:text="${user.username}"/>
             <td th:text="${user.email}"/>
@@ -92,9 +98,9 @@
                 <button th:onclick="deleteUser([[${user.id}]], [[${user.username}]])">Delete</button>
             </td>
         </tr>
-    </th:block>
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 
 <div style="display: flex; gap: 20px">
     <div class="pagination-item" th:if="${pageNumbers!=null}" th:each="pageNumber: ${pageNumbers}">
