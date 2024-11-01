@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -53,7 +52,7 @@ public class UserDTO {
 
     @Override
     public String toString() {
-        return "UserForm{" +
+        return "UserDTO{" +
                 "username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", birthday='" + birthday + '\'' +
@@ -62,12 +61,11 @@ public class UserDTO {
 
     public User toUser() {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-            Date birthdayParsed = sdf.parse(birthday);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             User user = new User();
             user.setUsername(username);
             user.setEmail(email);
-            user.setBirthday(birthdayParsed);
+            user.setBirthday(sdf.parse(birthday));
             return user;
         } catch (ParseException e) {
             throw new MyValidationException("Invalid birthday!");
