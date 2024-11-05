@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -91,5 +92,9 @@ public class UserService {
 
     public Resource loadFileAsResource(String filename) {
         return storageService.loadAsResource(filename);
+    }
+
+    public List<User> getUsersByBirthday(Date birthday) {
+        return userRepository.findUsersByBirthday(birthday);
     }
 }
