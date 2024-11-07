@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,10 +24,10 @@ public class User {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    /// Add [Temporal] and [DateTimeFormat] annotations to get only date part with pattern
-    @Temporal(TemporalType.DATE)
-    /// The <input type="date"...> is always formatted yyyy-mm-dd!
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "birthday", unique = true, nullable = false)
-    private Date birthday;
+    //    /// Add [Temporal] and [DateTimeFormat] annotations to get only date part with pattern
+//    @Temporal(TemporalType.DATE)
+//    /// The <input type="date"...> is always formatted yyyy-mm-dd!
+//    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "birthday", nullable = false)
+    private LocalDate birthday;
 }
