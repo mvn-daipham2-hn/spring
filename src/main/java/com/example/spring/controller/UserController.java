@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.thymeleaf.exceptions.TemplateProcessingException;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -72,18 +71,14 @@ public class UserController {
 
     @PostMapping("/add-user")
     public String addUser(
-            @Valid UserDTO userForm,
+            @ModelAttribute("userForm") @Valid UserDTO userForm,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             return "add-user";
         }
-        try {
-            userService.addUser(userForm);
-            return "redirect:/users";
-        } catch (TemplateProcessingException e) {
-            return "add-user";
-        }
+        userService.addUser(userForm);
+        return "redirect:/users";
     }
 
     @GetMapping("/edit-user/{id}")

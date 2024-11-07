@@ -1,6 +1,7 @@
 package com.example.spring.dto;
 
 import com.example.spring.exception.MyValidationException;
+import com.example.spring.helper.StringHelper;
 import com.example.spring.model.User;
 import com.example.spring.validation.HasDateFormatted;
 import jakarta.validation.constraints.Email;
@@ -10,8 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Optional;
 
 @Data
 @NoArgsConstructor
@@ -25,19 +26,19 @@ public class UserDTO {
     private String email;
 
     @NotBlank(message = "Birthday must not blank!")
-    @HasDateFormatted(message = "Birthday must be in format `dd-MM-yyyy`!")
+    @HasDateFormatted
     private String birthday;
 
     public User toUser() {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            User user = new User();
-            user.setUsername(username);
-            user.setEmail(email);
-            user.setBirthday(sdf.parse(birthday));
-            return user;
-        } catch (ParseException e) {
-            throw new MyValidationException("Invalid birthday!");
+        Optional<LocalDate> birthdayOptional = StringHelper.toLocalDate(birthday);
+        if (birthdayOptional.isEmpty()) {
+            throw new MyValidationException("Invalid birthday format!");
         }
+
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setBirthday(birthdayOptional.get());
+        return user;
     }
 }

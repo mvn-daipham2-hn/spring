@@ -43,11 +43,11 @@ public class BatchConfiguration {
         return new VirtualThreadTaskExecutor("virtual-thread-executor");
     }
 
-    ///  {@code java -jar target/spring-0.0.1-SNAPSHOT.jar --spring.batch.job.name=<job-name-to-execute>}
+    ///  {@code java -jar <path-to-jar-file> --spring.batch.job.name=<job-name-to-execute>}
     ///
-    ///  {@code java -jar target/spring-0.0.1-SNAPSHOT.jar --spring.batch.job.names=<job-name-to-execute>}
+    ///  {@code java -jar <path-to-jar-file> --spring.batch.job.names=<job-name-to-execute>}
     ///
-    ///  {@code java -jar target/spring-0.0.1-SNAPSHOT.jar --batch-job=<job-name-to-execute>}
+    ///  {@code java -jar <path-to-jar-file> --batch-job=<job-name-to-execute>}
     @Bean
     public CommandLineRunner runBatchJob() {
         return args -> {
