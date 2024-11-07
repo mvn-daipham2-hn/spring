@@ -1,4 +1,4 @@
-package com.example.spring.storage;
+package com.example.spring.exception;
 
 public class StorageFileNotFoundException extends StorageException {
     public StorageFileNotFoundException(String message) {

@@ -1,4 +1,4 @@
-package com.example.spring.storage;
+package com.example.spring.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

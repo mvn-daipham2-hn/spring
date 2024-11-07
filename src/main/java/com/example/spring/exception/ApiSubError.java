@@ -1,4 +1,4 @@
-package com.example.spring.errorhandler;
+package com.example.spring.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
-public class ApiValidationError extends ApiSubError {
+public class ApiSubError {
     private String object;
     private String field;
     private Object rejectedValue;

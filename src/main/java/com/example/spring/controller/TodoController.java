@@ -30,7 +30,7 @@ public class TodoController {
         return ResponseEntity.ok(todo);
     }
 
-    @PutMapping("/todo")
+    @PutMapping("/todos")
     ResponseEntity<String> updateTodo(
             @RequestBody Todo todo
     ) {
@@ -38,7 +38,7 @@ public class TodoController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/todo")
+    @PostMapping("/todos")
     ResponseEntity<String> createTodo(
             @RequestBody Todo todo
     ) {
@@ -46,8 +46,8 @@ public class TodoController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/todo")
-    ResponseEntity<String> deleteTodo(@RequestBody long id) {
+    @DeleteMapping("/todos/{id}")
+    ResponseEntity<String> deleteTodo(@PathVariable("id") long id) {
         boolean result = todoService.deleteTodo(id);
         return ResponseEntity.ok(result ? "Remove Success" : "Remove Failed");
     }

@@ -1,5 +1,6 @@
-package com.example.spring.model;
+package com.example.spring.security;
 
+import com.example.spring.model.Account;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

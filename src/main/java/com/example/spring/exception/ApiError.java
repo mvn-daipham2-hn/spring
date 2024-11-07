@@ -1,4 +1,4 @@
-package com.example.spring.errorhandler;
+package com.example.spring.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;

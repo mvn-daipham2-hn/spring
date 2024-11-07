@@ -1,7 +1,7 @@
 package com.example.spring.controller;
 
 import com.example.spring.dto.AccountDTO;
-import com.example.spring.service.AccountService;
+import com.example.spring.service.impl.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
