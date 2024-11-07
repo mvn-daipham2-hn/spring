@@ -1,30 +1,15 @@
 package com.example.spring.config;
 
-import com.example.spring.batch.JobCompletionNotificationListener;
-import com.example.spring.batch.UserItemProcessor;
-import com.example.spring.batch.UserItemReadListener;
-import com.example.spring.dto.UserCSVRecordDTO;
-import com.example.spring.model.User;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.sql.DataSource;
+import java.util.Arrays;
 
 /*
 Spring Batch organizes the batch processing flow through several primary components:
@@ -43,81 +28,67 @@ Spring Batch organizes the batch processing flow through several primary compone
 
     JobLauncher: Initiates job execution, usually managed by Spring's scheduling support or triggered through REST endpoints.
  */
-
 @Configuration
 public class BatchConfiguration {
-    @Value("${file.input}")
-    private String fileInput;
-    @Value("${spring.batch.job.name}")
-    private String jobName;
+    private final ApplicationContext applicationContext;
+    private final JobLauncher jobLauncher;
 
-
-    @Bean
-    public FlatFileItemReader<UserCSVRecordDTO> reader() {
-        BeanWrapperFieldSetMapper<UserCSVRecordDTO> fieldSetMapper = new BeanWrapperFieldSetMapper<>() {{
-            setTargetType(UserCSVRecordDTO.class);
-        }};
-        String[] nameOfFields = new String[]{"id", "username", "email", "birthday"};
-        return new FlatFileItemReaderBuilder<UserCSVRecordDTO>()
-                .name("userItemReader")
-                .resource(new ClassPathResource(fileInput))
-                // Configures the reader to parse the file as a delimited file (e.g., CSV).
-                // By default, this method assumes that the delimiter is a comma (,),
-                // but you can specify a different delimiter if needed (e.g., .delimiter("|"))
-                .delimited()
-                .names(nameOfFields)
-                .fieldSetMapper(fieldSetMapper)
-                .build();
+    public BatchConfiguration(ApplicationContext applicationContext, JobLauncher jobLauncher) {
+        this.applicationContext = applicationContext;
+        this.jobLauncher = jobLauncher;
     }
-
-    @Bean
-    public JdbcBatchItemWriter<User> writer(DataSource dataSource) {
-        return new JdbcBatchItemWriterBuilder<User>()
-                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("INSERT INTO `user`(`id`, `username`, `email`, `birthday`) VALUES (:id,:username,:email,:birthday)")
-                .dataSource(dataSource)
-                .build();
-    }
-
-    @Bean
-    public Job importUserJob(
-            JobRepository jobRepository,
-            JobCompletionNotificationListener listener,
-            Step importUserStep
-    ) {
-        return new JobBuilder(jobName, jobRepository)
-                .incrementer(new RunIdIncrementer())
-                .listener(listener)
-                .flow(importUserStep)
-                .end()
-                .build();
-    }
-
-    @Bean
-    public UserItemProcessor processor() {
-        return new UserItemProcessor();
-    }
-
-    @Bean
-    public Step importUserStep(
-            JobRepository jobRepository,
-            PlatformTransactionManager transactionManager,
-            JdbcBatchItemWriter<User> writer,
-            VirtualThreadTaskExecutor taskExecutor
-    ) {
-        return new StepBuilder("importUserStep", jobRepository)
-                .<UserCSVRecordDTO, User>chunk(10, transactionManager)
-                .reader(reader())
-                .processor(processor())
-                .writer(writer)
-                .listener(new UserItemReadListener())
-                .taskExecutor(taskExecutor)
-                .build();
-    }
-
 
     @Bean
     public VirtualThreadTaskExecutor taskExecutor() {
         return new VirtualThreadTaskExecutor("virtual-thread-executor");
+    }
+
+    ///  {@code java -jar target/spring-0.0.1-SNAPSHOT.jar --spring.batch.job.name=<job-name-to-execute>}
+    ///
+    ///  {@code java -jar target/spring-0.0.1-SNAPSHOT.jar --spring.batch.job.names=<job-name-to-execute>}
+    ///
+    ///  {@code java -jar target/spring-0.0.1-SNAPSHOT.jar --batch-job=<job-name-to-execute>}
+    @Bean
+    public CommandLineRunner runBatchJob() {
+        return args -> {
+            String batchJobArg = Arrays
+                    .stream(args)
+                    .filter(arg ->
+                            arg.startsWith("--spring.batch.job.names")
+                                    || arg.startsWith("--spring.batch.job.name")
+                                    || arg.startsWith("--batch-job")
+                    )
+                    .findFirst()
+                    .orElse(null);
+            if (batchJobArg != null) {
+                String[] batchJobArgs = batchJobArg.split("=");
+                if (batchJobArgs.length == 2) {
+                    Job job = getJob(batchJobArgs[1]);
+                    if (job != null) {
+                        runJob(job);
+                    } else {
+                        System.out.println("Batch job argument not found: " + batchJobArgs[1]);
+                    }
+                } else {
+                    System.out.println("Batch job argument is not valid");
+                }
+            }
+        };
+    }
+
+    private void runJob(Job job) {
+        try {
+            System.out.println("Running job " + job.getName());
+            jobLauncher.run(job, new JobParameters());
+        } catch (Exception e) {
+            System.out.println("Error running job: " + e.getMessage());
+        }
+    }
+
+    private Job getJob(String jobName) {
+        if (applicationContext.containsBean(jobName)) {
+            return applicationContext.getBean(jobName, Job.class);
+        }
+        return null;
     }
 }

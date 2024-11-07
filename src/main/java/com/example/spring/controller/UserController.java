@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.thymeleaf.exceptions.TemplateProcessingException;
 
 import java.nio.file.Path;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,11 +78,12 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "add-user";
         }
-        boolean isSuccessful = userService.addUser(userForm);
-        if (!isSuccessful) {
+        try {
+            userService.addUser(userForm);
+            return "redirect:/users";
+        } catch (TemplateProcessingException e) {
             return "add-user";
         }
-        return "redirect:/users";
     }
 
     @GetMapping("/edit-user/{id}")
@@ -188,30 +189,19 @@ public class UserController {
                     "Only support uploaded .csv files!"
             );
         } else {
-            userService.storeFileAndImportUsers(file);
-            redirectAttributes.addFlashAttribute(
-                    "message",
-                    "You successfully uploaded " + file.getOriginalFilename() + "!"
-            );
+            try {
+                userService.storeFileAndImportUsers(file);
+                redirectAttributes.addFlashAttribute(
+                        "message",
+                        "You successfully uploaded " + file.getOriginalFilename() + "!"
+                );
+            } catch (ConstraintViolationException e) {
+                redirectAttributes.addFlashAttribute(
+                        "error_message",
+                        "Some records invalidate or wrong format!"
+                );
+            }
         }
-        return "redirect:/users/upload";
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    private String handleConstraintViolationException(RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute(
-                "error_message",
-                "Some records invalidate or wrong format!"
-        );
-        return "redirect:/users/upload";
-    }
-
-    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    private String handleSQLIntegrityConstraintViolationException(RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute(
-                "error_message",
-                "Some records are duplicated!"
-        );
         return "redirect:/users/upload";
     }
 }

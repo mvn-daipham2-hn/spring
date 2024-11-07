@@ -1,9 +1,9 @@
-package com.example.spring.service;
+package com.example.spring.service.impl;
 
 import com.example.spring.dao.AccountRepository;
 import com.example.spring.dto.AccountDTO;
 import com.example.spring.model.Account;
-import com.example.spring.model.AccountDetails;
+import com.example.spring.security.AccountDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

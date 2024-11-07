@@ -1,4 +1,4 @@
-package com.example.spring.storage;
+package com.example.spring.config;
 
 import lombok.Getter;
 import lombok.Setter;

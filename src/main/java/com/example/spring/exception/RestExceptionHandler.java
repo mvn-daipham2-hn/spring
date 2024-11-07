@@ -1,7 +1,5 @@
-package com.example.spring.errorhandler;
+package com.example.spring.exception;
 
-import com.example.spring.storage.StorageException;
-import com.example.spring.storage.StorageFileNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -10,13 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@ControllerAdvice(basePackages = "com.example.spring.controller")
+@RestControllerAdvice(basePackages = "com.example.spring.controller")
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         ApiErrorResponse errorResponse = new ApiErrorResponse(apiError);
@@ -37,7 +35,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(MyValidationException.class)
     protected ResponseEntity<Object> handleValidationErrors(MyValidationException ex) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getSubErrors());
+        ApiError apiError = new ApiError(ex.getHttpStatus(), ex.getMessage(), ex.getSubErrors());
         return buildResponseEntity(apiError);
     }
 

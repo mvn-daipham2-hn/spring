@@ -1,4 +1,4 @@
-package com.example.spring.errorhandler;
+package com.example.spring.exception;
 
 import lombok.Getter;
 import lombok.Setter;

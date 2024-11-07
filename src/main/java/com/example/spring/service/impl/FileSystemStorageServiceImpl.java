@@ -1,9 +1,9 @@
-package com.example.spring.service;
+package com.example.spring.service.impl;
 
-import com.example.spring.storage.StorageException;
-import com.example.spring.storage.StorageFileNotFoundException;
-import com.example.spring.storage.StorageProperties;
-import com.example.spring.storage.StorageService;
+import com.example.spring.config.StorageProperties;
+import com.example.spring.exception.StorageException;
+import com.example.spring.exception.StorageFileNotFoundException;
+import com.example.spring.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -12,22 +12,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 @Service
-public class FileSystemStorageService implements StorageService {
+public class FileSystemStorageServiceImpl implements StorageService {
     private final Path rootLocation;
 
     @Autowired
-    public FileSystemStorageService(StorageProperties properties) {
+    public FileSystemStorageServiceImpl(StorageProperties properties) {
         if (properties.getLocation().trim().isEmpty()) {
             throw new StorageException("File upload location can not be empty.");
         }
