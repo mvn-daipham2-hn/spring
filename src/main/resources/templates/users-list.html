@@ -92,7 +92,7 @@
             <td th:text="${user.id}"/>
             <td th:text="${user.username}"/>
             <td th:text="${user.email}"/>
-            <td th:text="${#dates.format(user.birthday, 'dd-MM-yyyy')}"/>
+            <td th:text="${user.birthday}"/>
             <td>
                 <button th:onclick="editUser([[${user.id}]])">Edit</button>
                 <button th:onclick="deleteUser([[${user.id}]], [[${user.username}]])">Delete</button>

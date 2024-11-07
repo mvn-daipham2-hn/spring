@@ -2,7 +2,6 @@ package com.example.spring.controller;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -32,7 +31,7 @@ public class BatchController {
 
 
     @PostMapping("/startJob/{jobName}")
-    public ResponseEntity<String> startJob(@PathVariable String jobName) {
+    public ResponseEntity<String> startJob(@PathVariable("jobName") String jobName) {
         try {
             Job job = getJob(jobName);
             if (job == null) {
@@ -43,7 +42,7 @@ public class BatchController {
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Job execution failed, " + e.getMessage()
+                    .body("Job execution failed: " + e.getMessage()
                     );
         }
     }
