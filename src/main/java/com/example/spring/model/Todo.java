@@ -1,11 +1,13 @@
 package com.example.spring.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Setter
-@Getter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "todo")
 public class Todo {
